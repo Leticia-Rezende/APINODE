@@ -14,7 +14,8 @@ export class CreateSituationsTable1757013275523 implements MigrationInterface {
                     generationStrategy: "increment"
                 },{
                     name: "nameSituation",
-                    type: "varchar"
+                    type: "varchar",
+                    isUnique: true,
                 },{
                     name: "createdAt",
                     type: "timestamp",

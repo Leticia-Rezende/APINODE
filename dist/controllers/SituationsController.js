@@ -1,22 +1,67 @@
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
 // importar a biblioteca do Express
-var express = ;
- * from;
-"express";
-import { AppDataSource } from "../data-source.js";
-import { Situation } from "../entity/Situation.js";
+const express_1 = __importDefault(require("express"));
+const data_source_1 = require("../data-source");
+const Situation_1 = require("../entity/Situation");
 //Criar a aplicação Express
-const router = express.Router();
-// Criar a rota GET principal
-router.get("/situations", (req, res) => {
-    res.send("Programação com Leticia Situações");
-});
+const router = express_1.default.Router();
+// Criar a Lista
+router.get("/situations", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const situationRepository = data_source_1.AppDataSource.getRepository(Situation_1.Situation);
+        const situations = yield situationRepository.find();
+        res.status(200).json(situations); //Lista todos os dados do banco
+        return;
+    }
+    catch (error) {
+        res.status(500).json({
+            message: "Erro ao Listar a situação!",
+        });
+        return;
+    }
+}));
+// Criar a Visualização do item cadastrado em situação
+router.get("/situations/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.params;
+        const situationRepository = data_source_1.AppDataSource.getRepository(Situation_1.Situation);
+        const situation = yield situationRepository.findOneBy({ id: parseInt(id) });
+        if (!situation) {
+            res.status(404).json({
+                message: "Situação não encontrada!",
+            });
+            return;
+        }
+        res.status(200).json(situation); //Lista todos os dados do banco
+        return;
+    }
+    catch (error) {
+        res.status(500).json({
+            message: "Erro ao Visualizar a situação!",
+        });
+        return;
+    }
+}));
 // Criar a rota Post principal
-router.post("/situations", async (req, res) => {
+router.post("/situations", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         var data = req.body;
-        const situationRepository = AppDataSource.getRepository(Situation);
+        const situationRepository = data_source_1.AppDataSource.getRepository(Situation_1.Situation);
         const newSituation = situationRepository.create(data);
-        await situationRepository.save(newSituation); //Isso que irá salvar no banco de dados
+        yield situationRepository.save(newSituation); //Isso que irá salvar no banco de dados
         res.status(201).json({
             message: "Situação cadastrada com sucesso!",
             situation: newSituation,
@@ -27,9 +72,38 @@ router.post("/situations", async (req, res) => {
             message: "Erro ao cadastrar a situação!",
         });
     }
-});
+}));
+// Criar a Visualização do item cadastrado em situação
+router.put("/situations/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.params;
+        var data = req.body;
+        const situationRepository = data_source_1.AppDataSource.getRepository(Situation_1.Situation);
+        const situation = yield situationRepository.findOneBy({ id: parseInt(id) }); //Busca pelo ID digitado
+        if (!situation) { //Se passar um ID que não exite ele passa a seguinte mensagem
+            res.status(404).json({
+                message: "Situação não encontrada!",
+            });
+            return;
+        }
+        //Atualiza os dados
+        situationRepository.merge(situation, data);
+        //Salvar as alterações de dados
+        const updateSituation = yield situationRepository.save(situation);
+        res.status(200).json({
+            messagem: "Situação atualizada com sucesso!",
+            situation: updateSituation,
+        });
+    }
+    catch (error) {
+        res.status(500).json({
+            message: "Erro ao Atualizar a situação!",
+        });
+        return;
+    }
+}));
 //Exportar a instrução da rota
-export default router;
+exports.default = router;
 //Iniciar o servidor na porta definida na variável de ambiente
 //app.listen(8080, () => {
 //  console.log("Servidor iniciado na porta 8080: http://localhost:8080")

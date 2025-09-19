@@ -8,10 +8,54 @@ import { Situation } from "../entity/Situation";
 const router = express.Router();
 
 
-// Criar a rota GET principal
-router.get("/situations",(req:Request, res:Response)=>{
-    res.send("Programação com Leticia Situações")
+// Criar a Lista
+router.get("/situations",async(req:Request, res:Response)=>{
+  try{
+    const situationRepository = AppDataSource.getRepository(Situation);
+
+    const situations = await situationRepository.find();
+
+    res.status(200).json(situations); //Lista todos os dados do banco
+    return
+
+  }catch(error){
+    res.status(500).json({
+        message : "Erro ao Listar a situação!",
+      });
+      return
+  }
 });
+
+// Criar a Visualização do item cadastrado em situação
+router.get("/situations/:id",async(req:Request, res:Response)=>{
+  try{
+
+    const {id} = req.params;
+
+    const situationRepository = AppDataSource.getRepository(Situation);
+
+    const situation = await situationRepository.findOneBy({id : parseInt(id)})
+
+    if(!situation){
+      res.status(404).json({
+        message : "Situação não encontrada!",
+      });
+      return
+
+    }
+
+    res.status(200).json(situation); //Lista todos os dados do banco
+    return
+
+  }catch(error){
+    res.status(500).json({
+        message : "Erro ao Visualizar a situação!",
+      });
+      return
+  }
+});
+
+
 
 // Criar a rota Post principal
 router.post("/situations",async(req:Request, res:Response)=>{
@@ -36,6 +80,46 @@ router.post("/situations",async(req:Request, res:Response)=>{
       });
 
     }
+});
+
+// Criar a Visualização do item cadastrado em situação
+router.put("/situations/:id",async(req:Request, res:Response)=>{
+  try{
+
+    const {id} = req.params;
+
+    var data = req.body;
+
+    const situationRepository = AppDataSource.getRepository(Situation);
+
+    const situation = await situationRepository.findOneBy({id : parseInt(id)}) //Busca pelo ID digitado
+
+    if(!situation){ //Se passar um ID que não exite ele passa a seguinte mensagem
+      res.status(404).json({
+        message : "Situação não encontrada!",
+      });
+      return
+
+    }
+
+    //Atualiza os dados
+    situationRepository.merge(situation, data);
+
+    //Salvar as alterações de dados
+    const updateSituation = await situationRepository.save(situation);
+
+    res.status(200).json({
+      messagem: "Situação atualizada com sucesso!",
+      situation: updateSituation,
+    }); 
+    
+
+  }catch(error){
+    res.status(500).json({
+        message : "Erro ao Atualizar a situação!",
+      });
+      return
+  }
 });
 
 

@@ -1,5 +1,5 @@
 // importar a biblioteca do Express
-import express from "express"
+import express from "express";
 
 //Importar variaveis de ambiente
 import dotenv from "dotenv";
