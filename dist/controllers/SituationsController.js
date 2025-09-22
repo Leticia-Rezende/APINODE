@@ -21,9 +21,45 @@ const router = express_1.default.Router();
 // Criar a Lista
 router.get("/situations", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        //Obter o repositório da entidade Situation
         const situationRepository = data_source_1.AppDataSource.getRepository(Situation_1.Situation);
-        const situations = yield situationRepository.find();
-        res.status(200).json(situations); //Lista todos os dados do banco
+        //Receber o número da página e definir página 1 como padrão
+        const page = Number(req.query.page) || 1;
+        //Definir o limite de registros por página
+        const limite = 1;
+        //Contar o total de registros no banco de dados
+        const totalSituations = yield situationRepository.count();
+        //Verificar se existem registros
+        if (totalSituations === 0) {
+            res.status(400).json({
+                message: "Nenhuma situação encontrada",
+            });
+            return;
+        }
+        //Calcular a última página
+        const lastPage = Math.ceil(totalSituations / limite);
+        //Verificar se a página solicitada é válida
+        if (page > lastPage) {
+            res.status(400).json({
+                message: `Página inválida. O total de páginas é ${lastPage}`, //Depois arrumar, não está aparecendo a quantidade de páginas
+            });
+            return;
+        }
+        //Calcular o offset (a partir de qual registro começar a busca)
+        const offset = (page - 1) * limite;
+        //Recuperar as situações do banco de dados com paginação
+        const situations = yield situationRepository.find({
+            take: limite,
+            skip: offset,
+            order: { id: "DESC" }
+        });
+        //Retornar a resposta com os dados e informações da paginação
+        res.status(200).json({
+            currentPage: page,
+            lastPage,
+            totalSituations,
+            situations,
+        }); //Lista todos os dados do banco
         return;
     }
     catch (error) {

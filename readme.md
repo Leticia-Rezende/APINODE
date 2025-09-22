@@ -92,3 +92,7 @@ npx typeorm migration:create src/migration/CreateUsersTable
 Executar as migrations para criar as tabelas no banco de dados 
 
 npx typeorm migration:run -d dist/data-source.js
+
+Executar as seeds para cadastrar registro de teste nas tabelas no banco de dados
+
+node dist/run-seeds.js
