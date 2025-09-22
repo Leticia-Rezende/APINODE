@@ -55,7 +55,7 @@ router.get("/situations/:id", (req, res) => __awaiter(void 0, void 0, void 0, fu
         return;
     }
 }));
-// Criar a rota Post principal
+// Cadastra item no banco de dados
 router.post("/situations", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         var data = req.body;
@@ -73,7 +73,7 @@ router.post("/situations", (req, res) => __awaiter(void 0, void 0, void 0, funct
         });
     }
 }));
-// Criar a Visualização do item cadastrado em situação
+// Faz a atualização do item cadastrado 
 router.put("/situations/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;
@@ -93,6 +93,31 @@ router.put("/situations/:id", (req, res) => __awaiter(void 0, void 0, void 0, fu
         res.status(200).json({
             messagem: "Situação atualizada com sucesso!",
             situation: updateSituation,
+        });
+    }
+    catch (error) {
+        res.status(500).json({
+            message: "Erro ao Atualizar a situação!",
+        });
+        return;
+    }
+}));
+// Remove o item cadastrado no banco de dados
+router.delete("/situations/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.params;
+        const situationRepository = data_source_1.AppDataSource.getRepository(Situation_1.Situation);
+        const situation = yield situationRepository.findOneBy({ id: parseInt(id) }); //Busca pelo ID digitado
+        if (!situation) { //Se passar um ID que não exite ele passa a seguinte mensagem
+            res.status(404).json({
+                message: "Situação não encontrada!",
+            });
+            return;
+        }
+        //Remove os dados no banco
+        yield situationRepository.remove(situation);
+        res.status(200).json({
+            messagem: "Situação foi removida com sucesso!",
         });
     }
     catch (error) {
