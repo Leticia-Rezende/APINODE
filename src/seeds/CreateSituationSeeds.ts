@@ -21,6 +21,7 @@ export default class CreateSituationSeeds {
             {nameSituation: "Pedente"},
         ]
 
+        //Salva o array de objetos JSON diretamente 
         await situationRepository.save(situations);
 
         console.log("Seed concluído com sucesso: situações cadastradas")

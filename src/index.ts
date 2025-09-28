@@ -16,11 +16,17 @@ app.use(express.json());
 //Incluir os controlleres
 import AuthController from "./controllers/AuthController";
 import SituationsController from "./controllers/SituationsController";
+import ProductController from "./controllers/ProductController";
+import ProductSituationController from "./controllers/ProductSituationController";
+import ProductCategoryController from "./controllers/ProductCategoryController";
 
 
 //Criar as rotas
 app.use("/", AuthController)
 app.use("/", SituationsController)
+app.use("/", ProductController)
+app.use ("/", ProductCategoryController)
+app.use ("/", ProductSituationController)
 
 
 //Iniciar o servidor na porta definida na variável de ambiente

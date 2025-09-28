@@ -14,15 +14,25 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const data_source_1 = require("./data-source");
 const CreateSituationSeeds_1 = __importDefault(require("./seeds/CreateSituationSeeds"));
+const CreateProductSituationSeeds_1 = __importDefault(require("./seeds/CreateProductSituationSeeds"));
+const CreateProductCategorySeeds_1 = __importDefault(require("./seeds/CreateProductCategorySeeds"));
+const CreateProductSeeds_1 = __importDefault(require("./seeds/CreateProductSeeds"));
 const runSeeds = () => __awaiter(void 0, void 0, void 0, function* () {
     console.log("Conectando ao banco de dados...");
     yield data_source_1.AppDataSource.initialize();
-    console.log("Banoc de dados conectado! ");
+    console.log("Banco de dados conectado! ");
     try {
-        //Cria a isntancia da classe de Seed
-        const situatiosSeeds = new CreateSituationSeeds_1.default();
-        //Executa as Seeds
-        yield situatiosSeeds.run(data_source_1.AppDataSource);
+        yield data_source_1.AppDataSource.initialize();
+        console.log("Banco de dados conectado! ");
+        // Seed para 'situations' 
+        yield new CreateSituationSeeds_1.default().run(data_source_1.AppDataSource);
+        // Seed para 'product_situations'
+        yield new CreateProductSituationSeeds_1.default().run(data_source_1.AppDataSource);
+        // Seed para 'product_categories'
+        yield new CreateProductCategorySeeds_1.default().run(data_source_1.AppDataSource);
+        // Seed para 'products'
+        yield new CreateProductSeeds_1.default().run(data_source_1.AppDataSource);
+        console.log("Todas as Seeds foram executadas com sucesso!");
     }
     catch (error) {
         console.log("Erro ao executar o seed: ", error);

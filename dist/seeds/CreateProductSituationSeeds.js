@@ -9,26 +9,29 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const Situation_1 = require("../entity/Situation");
-class CreateSituationSeeds {
+const ProductSituation_1 = require("../entity/ProductSituation");
+class CreateProductSituationSeeds {
     run(dataSource) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log("Iniciando o seed para a tabela 'situation' ...");
-            const situationRepository = dataSource.getRepository(Situation_1.Situation);
+            console.log("Iniciando o seed para a tabela 'product_situations'...");
+            const situationRepository = dataSource.getRepository(ProductSituation_1.ProductSituation);
             const existingCount = yield situationRepository.count();
             if (existingCount > 0) {
-                console.log("A tabela 'situations' já existe possuí dados. Nenhuma alteração foi realizada");
+                console.log("A tabela 'product_situations' já possui dados. Nenhuma alteração foi realizada.");
                 return;
             }
-            const situations = [
-                { nameSituation: "Ativo" },
-                { nameSituation: "Inativo" },
-                { nameSituation: "Pedente" },
+            const situationsProductSituations = [
+                { nameProductSituation: "Ativo" },
+                { nameProductSituation: "Inativo" },
+                { nameProductSituation: "Esgotado" },
+                { nameProductSituation: "Em promoção" },
             ];
+            // 1. Converte o array de JSON em um array de instâncias de ProductCategory
+            const newSituation = situationsProductSituations.map(data => situationRepository.create(data));
             //Salva o array de objetos JSON diretamente 
-            yield situationRepository.save(situations);
-            console.log("Seed concluído com sucesso: situações cadastradas");
+            yield situationRepository.save(newSituation);
+            console.log("Seed concluído com sucesso: situações de produto cadastradas!");
         });
     }
 }
-exports.default = CreateSituationSeeds;
+exports.default = CreateProductSituationSeeds;

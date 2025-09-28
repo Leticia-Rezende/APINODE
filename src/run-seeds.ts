@@ -1,18 +1,33 @@
 import { AppDataSource } from "./data-source"
 import CreateSituationSeeds from "./seeds/CreateSituationSeeds";
+import CreateProductSituationSeeds from "./seeds/CreateProductSituationSeeds";
+import CreateProductCategorySeeds from "./seeds/CreateProductCategorySeeds";
+import CreateProductSeeds from "./seeds/CreateProductSeeds";
 
 const runSeeds = async() =>{
     console.log("Conectando ao banco de dados...")
 
     await AppDataSource.initialize();
-    console.log("Banoc de dados conectado! ")
+    console.log("Banco de dados conectado! ")
 
     try{
-        //Cria a isntancia da classe de Seed
-        const situatiosSeeds = new CreateSituationSeeds();
+        await AppDataSource.initialize();
+        console.log("Banco de dados conectado! ")
+
         
-        //Executa as Seeds
-        await situatiosSeeds.run(AppDataSource);
+        // Seed para 'situations' 
+        await new CreateSituationSeeds().run(AppDataSource); 
+        
+        // Seed para 'product_situations'
+        await new CreateProductSituationSeeds().run(AppDataSource);
+
+        // Seed para 'product_categories'
+        await new CreateProductCategorySeeds().run(AppDataSource);
+        
+        // Seed para 'products'
+        await new CreateProductSeeds().run(AppDataSource);
+
+        console.log("Todas as Seeds foram executadas com sucesso!");
 
     }catch(error){
 

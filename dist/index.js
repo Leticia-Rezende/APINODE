@@ -16,9 +16,15 @@ app.use(express_1.default.json());
 //Incluir os controlleres
 const AuthController_1 = __importDefault(require("./controllers/AuthController"));
 const SituationsController_1 = __importDefault(require("./controllers/SituationsController"));
+const ProductController_1 = __importDefault(require("./controllers/ProductController"));
+const ProductSituationController_1 = __importDefault(require("./controllers/ProductSituationController"));
+const ProductCategoryController_1 = __importDefault(require("./controllers/ProductCategoryController"));
 //Criar as rotas
 app.use("/", AuthController_1.default);
 app.use("/", SituationsController_1.default);
+app.use("/", ProductController_1.default);
+app.use("/", ProductCategoryController_1.default);
+app.use("/", ProductSituationController_1.default);
 //Iniciar o servidor na porta definida na variável de ambiente
 app.listen(process.env.PORT, () => {
     console.log(`Servidor iniciado na porta ${process.env.PORT}: http://localhost:${process.env.PORT}`);
