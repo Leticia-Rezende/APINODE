@@ -11,21 +11,31 @@ const runSeeds = async() =>{
     console.log("Banco de dados conectado! ")
 
     try{
-        await AppDataSource.initialize();
-        console.log("Banco de dados conectado! ")
-
         
         // Seed para 'situations' 
-        await new CreateSituationSeeds().run(AppDataSource); 
+        const situationsSeeds =  new CreateSituationSeeds(); 
         
         // Seed para 'product_situations'
-        await new CreateProductSituationSeeds().run(AppDataSource);
+        const productSituationSeeds = new CreateProductSituationSeeds();
 
         // Seed para 'product_categories'
-        await new CreateProductCategorySeeds().run(AppDataSource);
+         const productCategorySeeds = new CreateProductCategorySeeds();
         
         // Seed para 'products'
-        await new CreateProductSeeds().run(AppDataSource);
+         const productProductSeeds = new CreateProductSeeds();
+
+
+        //  
+        await  situationsSeeds.run(AppDataSource); 
+        
+        // Seed para 'product_situations'
+        await productSituationSeeds.run(AppDataSource);
+
+        // Seed para 'product_categories'
+        await  productCategorySeeds.run(AppDataSource);
+        
+        // Seed para 'products'
+        await productProductSeeds.run(AppDataSource);
 
         console.log("Todas as Seeds foram executadas com sucesso!");
 

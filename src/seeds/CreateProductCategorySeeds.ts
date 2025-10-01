@@ -21,11 +21,10 @@ export default class CreateProductCategorySeeds {
             { nameProductCategory: "Alimentos" },
         ];
 
-        //Converte o array de JSON em um array de instâncias de ProductCategory
-        const newCategorias = categoriesProductCategories.map(data => categoryRepository.create(data));
+
         
         // Salva o array de objetos JSON diretamente
-        await categoryRepository.save(newCategorias);
+        await categoryRepository.save(categoriesProductCategories);
 
         console.log("Seed concluído com sucesso: categorias de produto cadastradas!");
     }

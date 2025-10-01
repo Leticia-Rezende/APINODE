@@ -22,16 +22,22 @@ const runSeeds = () => __awaiter(void 0, void 0, void 0, function* () {
     yield data_source_1.AppDataSource.initialize();
     console.log("Banco de dados conectado! ");
     try {
-        yield data_source_1.AppDataSource.initialize();
-        console.log("Banco de dados conectado! ");
         // Seed para 'situations' 
-        yield new CreateSituationSeeds_1.default().run(data_source_1.AppDataSource);
+        const situationsSeeds = new CreateSituationSeeds_1.default();
         // Seed para 'product_situations'
-        yield new CreateProductSituationSeeds_1.default().run(data_source_1.AppDataSource);
+        const productSituationSeeds = new CreateProductSituationSeeds_1.default();
         // Seed para 'product_categories'
-        yield new CreateProductCategorySeeds_1.default().run(data_source_1.AppDataSource);
+        const productCategorySeeds = new CreateProductCategorySeeds_1.default();
         // Seed para 'products'
-        yield new CreateProductSeeds_1.default().run(data_source_1.AppDataSource);
+        const productProductSeeds = new CreateProductSeeds_1.default();
+        //  
+        yield situationsSeeds.run(data_source_1.AppDataSource);
+        // Seed para 'product_situations'
+        yield productSituationSeeds.run(data_source_1.AppDataSource);
+        // Seed para 'product_categories'
+        yield productCategorySeeds.run(data_source_1.AppDataSource);
+        // Seed para 'products'
+        yield productProductSeeds.run(data_source_1.AppDataSource);
         console.log("Todas as Seeds foram executadas com sucesso!");
     }
     catch (error) {
