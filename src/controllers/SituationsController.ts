@@ -3,6 +3,7 @@ import express, {Request, Response} from "express";
 import { AppDataSource } from "../data-source";
 import { Situation } from "../entity/Situation";
 import { PaginationService } from "../services/PaginationServices";
+import * as yup from 'yup';
 
 
 //Criar a aplicação Express
@@ -75,6 +76,13 @@ router.post("/situations",async(req:Request, res:Response)=>{
     try{
       var data = req.body;
 
+      const schema = yup.object().shape({
+        nameSituation: yup.string()
+        .required("O campo nome é obrigatório!") //Mensagem se dê erro
+        .min(3, "O campo deve ter no minímo 3 caracteres!") //Qauntidade de caracteres
+      });
+      await schema.validate(data, {abortEarly: false});
+
       const situationRepository = AppDataSource.getRepository(Situation)
       const newSituation = situationRepository.create(data);
 
@@ -87,6 +95,13 @@ router.post("/situations",async(req:Request, res:Response)=>{
 
     }catch(error){
 
+      if (error instanceof yup.ValidationError){
+          res.status(400).json({
+          message : error.errors
+        });
+        return;
+      }
+    
        res.status(500).json({
         message : "Erro ao cadastrar a situação!",
       });
@@ -101,6 +116,13 @@ router.put("/situations/:id",async(req:Request, res:Response)=>{
     const {id} = req.params;
 
     var data = req.body;
+
+    const schema = yup.object().shape({
+        nameSituation: yup.string()
+        .required("O campo nome é obrigatório!") //Mensagem se dê erro
+        .min(3, "O campo deve ter no minímo 3 caracteres!") //Qauntidade de caracteres
+      });
+      await schema.validate(data, {abortEarly: false});
 
     const situationRepository = AppDataSource.getRepository(Situation);
 
@@ -126,10 +148,18 @@ router.put("/situations/:id",async(req:Request, res:Response)=>{
     
 
   }catch(error){
+
+    if (error instanceof yup.ValidationError){
+          res.status(400).json({
+          message : error.errors
+        });
+        return;
+      }
+
     res.status(500).json({
         message : "Erro ao Atualizar a situação!",
       });
-      return
+      
   }
 });
 

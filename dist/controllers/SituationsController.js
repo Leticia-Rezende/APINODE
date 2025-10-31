@@ -1,4 +1,37 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -17,6 +50,7 @@ const express_1 = __importDefault(require("express"));
 const data_source_1 = require("../data-source");
 const Situation_1 = require("../entity/Situation");
 const PaginationServices_1 = require("../services/PaginationServices");
+const yup = __importStar(require("yup"));
 //Criar a aplicação Express
 const router = express_1.default.Router();
 // Criar a Lista
@@ -67,6 +101,12 @@ router.get("/situations/:id", (req, res) => __awaiter(void 0, void 0, void 0, fu
 router.post("/situations", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         var data = req.body;
+        const schema = yup.object().shape({
+            nameSituation: yup.string()
+                .required("O campo nome é obrigatório!") //Mensagem se dê erro
+                .min(3, "O campo deve ter no minímo 3 caracteres!") //Qauntidade de caracteres
+        });
+        yield schema.validate(data, { abortEarly: false });
         const situationRepository = data_source_1.AppDataSource.getRepository(Situation_1.Situation);
         const newSituation = situationRepository.create(data);
         yield situationRepository.save(newSituation); //Isso que irá salvar no banco de dados
@@ -76,6 +116,12 @@ router.post("/situations", (req, res) => __awaiter(void 0, void 0, void 0, funct
         });
     }
     catch (error) {
+        if (error instanceof yup.ValidationError) {
+            res.status(400).json({
+                message: error.errors
+            });
+            return;
+        }
         res.status(500).json({
             message: "Erro ao cadastrar a situação!",
         });
@@ -86,6 +132,12 @@ router.put("/situations/:id", (req, res) => __awaiter(void 0, void 0, void 0, fu
     try {
         const { id } = req.params;
         var data = req.body;
+        const schema = yup.object().shape({
+            nameSituation: yup.string()
+                .required("O campo nome é obrigatório!") //Mensagem se dê erro
+                .min(3, "O campo deve ter no minímo 3 caracteres!") //Qauntidade de caracteres
+        });
+        yield schema.validate(data, { abortEarly: false });
         const situationRepository = data_source_1.AppDataSource.getRepository(Situation_1.Situation);
         const situation = yield situationRepository.findOneBy({ id: parseInt(id) }); //Busca pelo ID digitado
         if (!situation) { //Se passar um ID que não exite ele passa a seguinte mensagem
@@ -104,10 +156,15 @@ router.put("/situations/:id", (req, res) => __awaiter(void 0, void 0, void 0, fu
         });
     }
     catch (error) {
+        if (error instanceof yup.ValidationError) {
+            res.status(400).json({
+                message: error.errors
+            });
+            return;
+        }
         res.status(500).json({
             message: "Erro ao Atualizar a situação!",
         });
-        return;
     }
 }));
 // Remove o item cadastrado no banco de dados
