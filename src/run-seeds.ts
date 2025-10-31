@@ -11,7 +11,12 @@ const runSeeds = async() =>{
     console.log("Banco de dados conectado! ")
 
     try{
+<<<<<<< HEAD
          // Seed para 'situations' 
+=======
+        
+        // Seed para 'situations' 
+>>>>>>> 4383062abe8304e932278db6d47370171e4433ec
         const situationsSeeds =  new CreateSituationSeeds(); 
         
         // Seed para 'product_situations'
