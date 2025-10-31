@@ -4,6 +4,7 @@ import { AppDataSource } from "../data-source";
 import { Situation } from "../entity/Situation";
 import { PaginationService } from "../services/PaginationServices";
 import * as yup from 'yup';
+import { Not } from "typeorm";
 
 
 //Criar a aplicação Express
@@ -84,6 +85,18 @@ router.post("/situations",async(req:Request, res:Response)=>{
       await schema.validate(data, {abortEarly: false});
 
       const situationRepository = AppDataSource.getRepository(Situation)
+
+      const existingsituation = await situationRepository.findOne({
+        where :  {nameSituation: data.nameSituation} //verifica se tem 
+      })
+      
+      if(existingsituation){ //Se existe esse dado no banco, ele vai exibir essa mensagem
+          res.status(400).json({
+          message : "Já existe uma situação cadastrada com esse nome!"
+        });
+        return;
+      }
+    
       const newSituation = situationRepository.create(data);
 
       await situationRepository.save(newSituation); //Isso que irá salvar no banco de dados
@@ -134,6 +147,21 @@ router.put("/situations/:id",async(req:Request, res:Response)=>{
       });
       return
     }
+
+    const existingsituation = await situationRepository.findOne({
+        where :  {
+          nameSituation: data.nameSituation,
+          id: Not(parseInt(id)),
+        } //verifica se tem 
+      })
+      
+      if(existingsituation){ //Se existe esse dado no banco, ele vai exibir essa mensagem
+          res.status(400).json({
+          message : "Já existe uma situação cadastrada com esse nome!"
+        });
+        return;
+      }
+    
 
     //Atualiza os dados
     situationRepository.merge(situation, data);

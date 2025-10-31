@@ -22,7 +22,6 @@ const runSeeds = () => __awaiter(void 0, void 0, void 0, function* () {
     yield data_source_1.AppDataSource.initialize();
     console.log("Banco de dados conectado! ");
     try {
-        // Seed para 'situations' 
         const situationsSeeds = new CreateSituationSeeds_1.default();
         // Seed para 'product_situations'
         const productSituationSeeds = new CreateProductSituationSeeds_1.default();

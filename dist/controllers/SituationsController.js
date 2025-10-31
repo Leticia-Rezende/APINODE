@@ -51,6 +51,7 @@ const data_source_1 = require("../data-source");
 const Situation_1 = require("../entity/Situation");
 const PaginationServices_1 = require("../services/PaginationServices");
 const yup = __importStar(require("yup"));
+const typeorm_1 = require("typeorm");
 //Criar a aplicação Express
 const router = express_1.default.Router();
 // Criar a Lista
@@ -108,6 +109,15 @@ router.post("/situations", (req, res) => __awaiter(void 0, void 0, void 0, funct
         });
         yield schema.validate(data, { abortEarly: false });
         const situationRepository = data_source_1.AppDataSource.getRepository(Situation_1.Situation);
+        const existingsituation = yield situationRepository.findOne({
+            where: { nameSituation: data.nameSituation } //verifica se tem 
+        });
+        if (existingsituation) { //Se existe esse dado no banco, ele vai exibir essa mensagem
+            res.status(400).json({
+                message: "Já existe uma situação cadastrada com esse nome!"
+            });
+            return;
+        }
         const newSituation = situationRepository.create(data);
         yield situationRepository.save(newSituation); //Isso que irá salvar no banco de dados
         res.status(201).json({
@@ -143,6 +153,18 @@ router.put("/situations/:id", (req, res) => __awaiter(void 0, void 0, void 0, fu
         if (!situation) { //Se passar um ID que não exite ele passa a seguinte mensagem
             res.status(404).json({
                 message: "Situação não encontrada!",
+            });
+            return;
+        }
+        const existingsituation = yield situationRepository.findOne({
+            where: {
+                nameSituation: data.nameSituation,
+                id: (0, typeorm_1.Not)(parseInt(id)),
+            } //verifica se tem 
+        });
+        if (existingsituation) { //Se existe esse dado no banco, ele vai exibir essa mensagem
+            res.status(400).json({
+                message: "Já existe uma situação cadastrada com esse nome!"
             });
             return;
         }
