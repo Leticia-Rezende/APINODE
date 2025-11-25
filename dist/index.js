@@ -20,6 +20,7 @@ app.use((0, cors_1.default)());
 //Incluir os controlleres
 const AuthController_1 = __importDefault(require("./controllers/AuthController"));
 const SituationsController_1 = __importDefault(require("./controllers/SituationsController"));
+const UsersController_1 = __importDefault(require("./controllers/UsersController"));
 const ProductController_1 = __importDefault(require("./controllers/ProductController"));
 const ProductSituationController_1 = __importDefault(require("./controllers/ProductSituationController"));
 const ProductCategoryController_1 = __importDefault(require("./controllers/ProductCategoryController"));
@@ -27,6 +28,7 @@ const TestConnectionController_1 = __importDefault(require("./controllers/TestCo
 //Criar as rotas
 app.use("/", AuthController_1.default);
 app.use("/", SituationsController_1.default);
+app.use("/", UsersController_1.default);
 app.use("/", ProductController_1.default);
 app.use("/", ProductCategoryController_1.default);
 app.use("/", ProductSituationController_1.default);

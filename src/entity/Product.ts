@@ -12,6 +12,14 @@ export class Product {
     @Column({length: 255})
     nameProduct!: string;
 
+    @Column ({unique: true})
+    slug!: string;
+
+    @Column ()
+    description!: string;
+
+    @Column({type: "decimal", precision: 10, scale: 2})
+
     @Column({ name: 'productSituationId' }) // <-- Indica ao TypeORM que esta é a coluna física no BD
     productSituationId!: number;
 

@@ -28,6 +28,10 @@ __decorate([
     __metadata("design:type", String)
 ], User.prototype, "email", void 0);
 __decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], User.prototype, "password", void 0);
+__decorate([
     (0, typeorm_1.ManyToOne)(() => Situation_1.Situation, (situation) => situation.users),
     (0, typeorm_1.JoinColumn)({ name: "situationId" }),
     __metadata("design:type", Situation_1.Situation)

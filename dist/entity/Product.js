@@ -25,6 +25,15 @@ __decorate([
     __metadata("design:type", String)
 ], Product.prototype, "nameProduct", void 0);
 __decorate([
+    (0, typeorm_1.Column)({ unique: true }),
+    __metadata("design:type", String)
+], Product.prototype, "slug", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], Product.prototype, "description", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "decimal", precision: 10, scale: 2 }),
     (0, typeorm_1.Column)({ name: 'productSituationId' }) // <-- Indica ao TypeORM que esta é a coluna física no BD
     ,
     __metadata("design:type", Number)

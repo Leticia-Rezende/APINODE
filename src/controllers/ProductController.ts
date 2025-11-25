@@ -3,6 +3,12 @@ import express, {Request, Response} from "express";
 import { AppDataSource } from "../data-source";
 import { Product } from "../entity/Product";
 import { PaginationService } from "../services/PaginationServices"; //Confirmar se posso usar a mesma pagina Service
+import { scheduler } from "timers/promises";
+import { abort } from "process";
+import { strict } from "assert";
+import * as yup from 'yup';
+import slugify from 'slugify' ;
+
 
 
 //Criar a aplicação Express
@@ -53,7 +59,6 @@ router.get("/products/:id",async(req:Request, res:Response)=>{
         message : "Produto não encontrada!",
       });
       return
-
     }
 
     res.status(200).json(product); //Lista todos os dados do banco
@@ -67,32 +72,112 @@ router.get("/products/:id",async(req:Request, res:Response)=>{
   }
 });
 
-
-
 // Cadastra item no banco de dados
 router.post("/products",async(req:Request, res:Response)=>{
 
     try{
+      //Receber os dados enviados no corpo da requisição
       var data = req.body;
 
+      //Valida os dados utilizando o yup
+      const schema = yup.object().shape({
+        name: yup
+            .string()
+            .required("O campo nome é obrigatório!")
+            .min(3, "O campo nome deve ter no mínimo 3 caracteres!")
+            .max(255, "O campo nome deve ter no máximo 255 caracteres!"),
+
+        slug: yup
+            .string()
+            .required("O campo slug é obrigatório!")
+            .min(3, "O campo slug deve ter no mínimo 3 caracteres!")
+            .max(255, "O campo slug deve ter no máximo 255 caracteres!"),
+
+        description: yup
+            .string()
+            .required("O campo descrição é obrigatório!")
+            .min(10, "A descrição deve ter pelo menos 10 caracteres!"),
+
+        price: yup
+            .number()
+            .typeError("O preço deve ser um número!")
+            .required("O campo preço é obrigatório!")
+            .positive("O preço deve ser um valor positivo!")
+            .test(
+                 "is-decimal",
+                  "O preço deve ter no máximo duas casas decimais!",
+                  (value) => /^\d+(\.\d{1,2})?$/.test(value?.toString() || "")
+            ),
+
+        situation: yup
+            .number()
+            .typeError("A situação deve ser um número!")
+            .required("O campo situação é obrigatório!")
+            .integer("O campo situação deve ser um número inteiro!")
+            .positive("O campo situação deve ser um valor positivo!"),
+
+        category: yup
+            .number()
+            .typeError("A categoria deve ser um número!")
+            .required("O campo categoria é obrigatório!")
+            .integer("O campo categoria deve ser um número inteiro!")
+            .positive("O campo categoria deve ser um valor positivo!"),
+
+      });
+
+      //Verifica se os dados passaram pela validação
+      await schema.validate(data, {abortEarly: false});
+
+      //Gera slug automaticamente com base no nome
+      data.slug = slugify(data.slug, {lower: true, strict: true});
+
+      //Cria uma isntância do repósitorio de Product
       const productRepository = AppDataSource.getRepository(Product)
+
+      //const newProduct = productRepository.create(data);
+
+      //await productRepository.save(newProduct); //Isso que irá salvar no banco de dados
+
+      //Recupera o registro do banco de dados com o valor da coluna slug
+      const existingProduct = await productRepository.findOne({
+        where: {slug: data.slug}
+      });
+
+      //Verifica se já existe um produto com o mesmo slug
+      if (existingProduct){
+        res.status(400).json({
+          message: "Já existe um produto cadastrado com esse slug"
+        });
+        return;
+      }
+
+      // Criar um novo registro
       const newProduct = productRepository.create(data);
 
-      await productRepository.save(newProduct); //Isso que irá salvar no banco de dados
+      // Salvar o registro no banco de dados
+      await productRepository.save(newProduct);
 
+      // Retornar resposta de sucesso
       res.status(201).json({
-        message : "Produto cadastrado com sucesso!",
-        situation: newProduct,
+        message: "Produto cadastrado com sucesso!",
+        product: newProduct,
+    });
+  } catch (error) {
+    if (error instanceof yup.ValidationError) {
+      // Retornar erros de validação
+      res.status(400).json({
+        message: error.errors
       });
-
-    }catch(error){
-
-       res.status(500).json({
-        message : "Erro ao cadastrar a produto!",
-      });
-
+      return;
     }
+
+    //Retornar erro em caso de falha
+    res.status(500).json({
+      message: "Erro ao cadastrar produto!",
+    });
+  }
 });
+
 
 // Faz a atualização do item cadastrado 
 router.put("/products/:id",async(req:Request, res:Response)=>{

@@ -3,6 +3,7 @@ import CreateSituationSeeds from "./seeds/CreateSituationSeeds";
 import CreateProductSituationSeeds from "./seeds/CreateProductSituationSeeds";
 import CreateProductCategorySeeds from "./seeds/CreateProductCategorySeeds";
 import CreateProductSeeds from "./seeds/CreateProductSeeds";
+import CreateUsersSeed from "./seeds/CreateUsersSeed";
 
 const runSeeds = async() =>{
     console.log("Conectando ao banco de dados...")
@@ -11,13 +12,12 @@ const runSeeds = async() =>{
     console.log("Banco de dados conectado! ")
 
     try{
-<<<<<<< HEAD
-         // Seed para 'situations' 
-=======
-        
+
         // Seed para 'situations' 
->>>>>>> 4383062abe8304e932278db6d47370171e4433ec
         const situationsSeeds =  new CreateSituationSeeds(); 
+
+        //Seed para 'Users'
+        const userSeed = new CreateUsersSeed();
         
         // Seed para 'product_situations'
         const productSituationSeeds = new CreateProductSituationSeeds();
@@ -28,9 +28,13 @@ const runSeeds = async() =>{
         // Seed para 'products'
          const productProductSeeds = new CreateProductSeeds();
 
+        // EXECUTAR AS SEEDS 
 
-        //  
+        //  Seed para 'situation'
         await  situationsSeeds.run(AppDataSource); 
+
+        //Seed para 'User'
+        await userSeed.run(AppDataSource);
         
         // Seed para 'product_situations'
         await productSituationSeeds.run(AppDataSource);

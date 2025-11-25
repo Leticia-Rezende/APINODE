@@ -22,6 +22,7 @@ app.use(cors());
 //Incluir os controlleres
 import AuthController from "./controllers/AuthController";
 import SituationsController from "./controllers/SituationsController";
+import UsersController from "./controllers/UsersController";
 import ProductController from "./controllers/ProductController";
 import ProductSituationController from "./controllers/ProductSituationController";
 import ProductCategoryController from "./controllers/ProductCategoryController";
@@ -29,12 +30,13 @@ import TestConnectionCOntroller from "./controllers/TestConnectionController";
 
 
 //Criar as rotas
-app.use("/", AuthController)
-app.use("/", SituationsController)
-app.use("/", ProductController)
-app.use ("/", ProductCategoryController)
-app.use ("/", ProductSituationController)
-app.use ("/", TestConnectionCOntroller)
+app.use("/", AuthController);
+app.use("/", SituationsController);
+app.use ("/", UsersController);
+app.use("/", ProductController);
+app.use ("/", ProductCategoryController);
+app.use ("/", ProductSituationController);
+app.use ("/", TestConnectionCOntroller);
 
 
 //Iniciar o servidor na porta definida na variável de ambiente

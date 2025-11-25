@@ -17,20 +17,27 @@ const CreateSituationSeeds_1 = __importDefault(require("./seeds/CreateSituationS
 const CreateProductSituationSeeds_1 = __importDefault(require("./seeds/CreateProductSituationSeeds"));
 const CreateProductCategorySeeds_1 = __importDefault(require("./seeds/CreateProductCategorySeeds"));
 const CreateProductSeeds_1 = __importDefault(require("./seeds/CreateProductSeeds"));
+const CreateUsersSeed_1 = __importDefault(require("./seeds/CreateUsersSeed"));
 const runSeeds = () => __awaiter(void 0, void 0, void 0, function* () {
     console.log("Conectando ao banco de dados...");
     yield data_source_1.AppDataSource.initialize();
     console.log("Banco de dados conectado! ");
     try {
+        // Seed para 'situations' 
         const situationsSeeds = new CreateSituationSeeds_1.default();
+        //Seed para 'Users'
+        const userSeed = new CreateUsersSeed_1.default();
         // Seed para 'product_situations'
         const productSituationSeeds = new CreateProductSituationSeeds_1.default();
         // Seed para 'product_categories'
         const productCategorySeeds = new CreateProductCategorySeeds_1.default();
         // Seed para 'products'
         const productProductSeeds = new CreateProductSeeds_1.default();
-        //  
+        // EXECUTAR AS SEEDS 
+        //  Seed para 'situation'
         yield situationsSeeds.run(data_source_1.AppDataSource);
+        //Seed para 'User'
+        yield userSeed.run(data_source_1.AppDataSource);
         // Seed para 'product_situations'
         yield productSituationSeeds.run(data_source_1.AppDataSource);
         // Seed para 'product_categories'
