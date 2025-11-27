@@ -8,7 +8,7 @@ import dotenv from "dotenv";
 import cors from 'cors';
 
 //Carregar as variaveis do arquivo .env
-dotenv.config()
+dotenv.config();
 
 //Criar a aplicação Express
 const app = express();
