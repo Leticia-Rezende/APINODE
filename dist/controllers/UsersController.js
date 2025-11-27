@@ -56,11 +56,13 @@ const PaginationServices_1 = require("../services/PaginationServices");
 //Importar a biblioteca para validar os dados para cadastrar e editar
 const yup = __importStar(require("yup"));
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
+//Importar o middleware de autenticação
+const authMiddleware_1 = require("../middlewares/authMiddleware");
 //Criar a aplicação Express
 const router = express_1.default.Router();
 //Criar a rota para listar os usuários
 //Endereço para acessar a API através da aplicação extrerna com o verb GET: https://localhost:8080/users?page=1&limit=10
-router.get("/users", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.get("/users", authMiddleware_1.verifyToken, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         //Obter o repositório da entidade User
         const userRepository = data_source_1.AppDataSource.getRepository(Users_1.User);
@@ -84,7 +86,7 @@ router.get("/users", (req, res) => __awaiter(void 0, void 0, void 0, function* (
 }));
 //Rota paa visualizar um usuário especifico
 //Endereço para acessar a API através da aplicação externa com o verbo GET: http://localhost:8080/users/:id
-router.get("/users/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.get("/users/:id", authMiddleware_1.verifyToken, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         //Obter o ID do usuário a partir dos paramentros da requisição
         const { id } = req.params;
@@ -120,7 +122,7 @@ router.get("/users/:id", (req, res) => __awaiter(void 0, void 0, void 0, functio
     "situation": 1
 }
 */
-router.post("/users", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post("/users", authMiddleware_1.verifyToken, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         //Receber os dados enviados no corpo da requisição
         var data = req.body;
@@ -181,7 +183,7 @@ router.post("/users", (req, res) => __awaiter(void 0, void 0, void 0, function* 
   "password": "123456"
 }
 */
-router.put("/users-password/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.put("/users-password/:id", authMiddleware_1.verifyToken, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // Obter o ID da situação a partir dos parâmetros da requisição
         const { id } = req.params;
@@ -242,7 +244,7 @@ router.put("/users-password/:id", (req, res) => __awaiter(void 0, void 0, void 0
 */
 //Criar a rota para apagar usuário
 //Endereço para acessar a API através da aplicação externa com o verbo DELETE: http://localhost:8080/users/:id
-router.delete("/users/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.delete("/users/:id", authMiddleware_1.verifyToken, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         //Obter o ID do usuário a partir dos parâmetros da requisição
         const { id } = req.params;
