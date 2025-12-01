@@ -20,8 +20,8 @@ class AddSlugToProductsts1763076478463 {
                 isUnique: true,
                 isNullable: false,
             }));
-            //Ajustar a ordem sa coluna
-            yield queryRunner.query(`ALTER TABLE products MODIFICY COLUMS slug varchar(255) AFTER name`);
+            // O comando correto é MODIFY COLUMN
+            yield queryRunner.query('ALTER TABLE products MODIFY COLUMN slug varchar(255) AFTER nameProduct');
         });
     }
     down(queryRunner) {

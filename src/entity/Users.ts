@@ -16,6 +16,9 @@ export class User {
     @Column()
     password!: string;
 
+    @Column({unique: true})
+    recoverPassword!: string;
+
     @ManyToOne(() => Situation, (situation) => situation.users) 
     @JoinColumn ({name: "situationId"})
     situation!: Situation;

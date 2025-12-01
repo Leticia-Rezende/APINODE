@@ -9,9 +9,10 @@ export class AddSlugToProductsts1763076478463 implements MigrationInterface {
             isUnique: true,
             isNullable: false,
         }));
+        
 
-        //Ajustar a ordem sa coluna
-        await queryRunner.query(`ALTER TABLE products MODIFICY COLUMS slug varchar(255) AFTER name`);
+        // O comando correto é MODIFY COLUMN
+        await queryRunner.query('ALTER TABLE products MODIFY COLUMN slug varchar(255) AFTER nameProduct');
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {

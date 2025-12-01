@@ -20,7 +20,7 @@ class AddPasswordToUsers1763076502175 {
                 isNullable: false,
             }));
             //Ajustar a ordem da coluna
-            yield queryRunner.query(`ALTER TABLE users MODIFICY COLUMS password varchar(255) AFTER email`);
+            yield queryRunner.query(`ALTER TABLE users MODIFY COLUMN password varchar(255) AFTER email`);
         });
     }
     down(queryRunner) {

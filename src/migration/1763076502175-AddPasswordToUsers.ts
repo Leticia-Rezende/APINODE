@@ -10,7 +10,7 @@ export class AddPasswordToUsers1763076502175 implements MigrationInterface {
         }));
 
         //Ajustar a ordem da coluna
-        await queryRunner.query(`ALTER TABLE users MODIFICY COLUMS password varchar(255) AFTER email`)
+        await queryRunner.query(`ALTER TABLE users MODIFY COLUMN password varchar(255) AFTER email`)
 
     }
 

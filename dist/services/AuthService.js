@@ -50,7 +50,7 @@ class AuthService {
             }
             //Gerar um token JWT para o usuário autenticado
             //O token inclui o ID do usuário e expira em 7 dias
-            const token = jsonwebtoken_1.default.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: "7d" });
+            const token = jsonwebtoken_1.default.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: "5d" });
             //Retorna os dados do usuário autenticado junto com o token gerado
             return { id: user.id, name: user.name, email: user.email, token };
         });
