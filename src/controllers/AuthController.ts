@@ -158,13 +158,6 @@ router.post("/recover-password", async (req:Request, res: Response) => {
           }
         })
 
-        // Retornar resposta de sucesso
-        res.status(200).json({
-          message: "Gerado o link para recuperar a senha!",
-          urlRecoverPassword: `${data.urlRecoverPassword}?email=${data.email}&key=${user.recoverPassword}`,
-          key: user.recoverPassword,
-        });
-
   }catch(error: any){
     //Retornar erro em caso de falha
       if (error instanceof yup.ValidationError) {
@@ -176,10 +169,71 @@ router.post("/recover-password", async (req:Request, res: Response) => {
         }
         // Retornar erro em caso de falha
         res.status(500).json({
-          message: "Erro ao editar a senha do usuário!",
+          message: "Erro ao recuperar a senha do usuário!",
         });
       }
 
+});
+
+// Criar a rota para validar a chave recuperar a senha
+// Endereço para acessar a api através da aplicação externa com o verbo POST: http://localhost:8080/validate-recover-password
+// A aplicação externa deve indicar que está enviado os dados em formato de objeto: Content-Type: application/json
+// Dados em formato de objeto
+/*
+{
+    "recoverPassword": "chave-recuperar-senha",
+    "email": "baiao@baiao.com.br"
+}
+*/
+
+router.post("/validate-recover-password", async (req:Request, res: Response) => {
+  try{
+     //Receber os dados enviados no corpo da requisição
+      var data = req.body;
+
+        //Validar os dados utilizando o yup
+      const schema = yup.object().shape({
+          recoverPassword: yup.string().required("A chave é obrigatória!"),
+          email: yup.string().email("E-mail inválido!").required("O campo e-mail é obrigatório!"),
+      });
+
+      //Verificar se os dados passaram pela validação
+      await schema.validate(data, {abortEarly: false});
+
+      //Criar uma instância do repositório de User
+      const userRepository = AppDataSource.getRepository(User);
+
+      //Recuperar o registro do banco de dados com o valor da coluna email
+      const user = await userRepository.findOneBy({email: data.email, recoverPassword: data.recoverPassword});
+
+      //Verifica se já existe um usuário com o mesmo e-mail
+      if(!user){
+          res.status(404).json({
+              message:"A chave recuper senha é inválida!",
+          });
+          return;
+        }
+
+        res.status(200).json({
+            message: "A chave recuper senha é válida!",
+        });
+        return;
+
+      }catch(error: any){
+    //Retornar erro em caso de falha
+      if (error instanceof yup.ValidationError) {
+            // Retornar erros de validação
+            res.status(400).json({
+             message: error.errors
+            });
+            return;
+        }
+        // Retornar erro em caso de falha
+        res.status(500).json({
+          message:"A chave recuper senha é inválida!",
+        });
+      }
+      
 });
 
 //Exportar a instrução da rota
