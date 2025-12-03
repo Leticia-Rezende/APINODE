@@ -55,7 +55,6 @@ const Users_1 = require("../entity/Users");
 const PaginationServices_1 = require("../services/PaginationServices");
 //Importar a biblioteca para validar os dados para cadastrar e editar
 const yup = __importStar(require("yup"));
-const bcryptjs_1 = __importDefault(require("bcryptjs"));
 //Importar o middleware de autenticação
 const authMiddleware_1 = require("../middlewares/authMiddleware");
 //Criar a aplicação Express
@@ -149,7 +148,7 @@ router.post("/users", authMiddleware_1.verifyToken, (req, res) => __awaiter(void
             return;
         }
         //Criptografar a senha antes de salvar
-        data.password = yield bcryptjs_1.default.hash(data.password, 10);
+        //data.password = await bcrypt.hash(data.password, 10)
         //Criar um novo registro
         const newUser = userRepository.create(data);
         //Salvar o registro no banco de dados
@@ -207,7 +206,7 @@ router.put("/users-password/:id", authMiddleware_1.verifyToken, (req, res) => __
             return;
         }
         // Criptografar a senha antes de salvar
-        data.password = yield bcryptjs_1.default.hash(data.password, 10);
+        //data.password = await bcrypt.hash(data.password, 10); --Foi colocado no Users
         // Atualizar os dados do usuário
         userRepository.merge(user, data);
         // Salvar as alterações no banco de dados

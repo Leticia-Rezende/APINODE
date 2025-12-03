@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from "typeorm"
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, BeforeInsert, BeforeUpdate } from "typeorm"
 import { Situation } from "./Situation";
 import bcrypt from "bcryptjs";
 
@@ -28,6 +28,14 @@ export class User {
 
     @Column({type: "timestamp", default:() => "CURRENT_TIMESTAMP", onUpdate: "CURRENT_TIMESTAMP" })
     updatedAt!: Date;
+
+    @BeforeInsert()
+    @BeforeUpdate()
+    async hashPassword(): Promise<void>{
+        if(this.password){
+            this.password = await bcrypt.hash(this.password,10)
+        }
+    }
 
     //metodo para comparar a senha informada pelo usuário com a senha amarzenada no banco de dados
     async comparePassword(password: string): Promise<boolean>{

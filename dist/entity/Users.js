@@ -26,6 +26,13 @@ const typeorm_1 = require("typeorm");
 const Situation_1 = require("./Situation");
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 let User = class User {
+    hashPassword() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (this.password) {
+                this.password = yield bcryptjs_1.default.hash(this.password, 10);
+            }
+        });
+    }
     //metodo para comparar a senha informada pelo usuário com a senha amarzenada no banco de dados
     comparePassword(password) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -67,6 +74,13 @@ __decorate([
     (0, typeorm_1.Column)({ type: "timestamp", default: () => "CURRENT_TIMESTAMP", onUpdate: "CURRENT_TIMESTAMP" }),
     __metadata("design:type", Date)
 ], User.prototype, "updatedAt", void 0);
+__decorate([
+    (0, typeorm_1.BeforeInsert)(),
+    (0, typeorm_1.BeforeUpdate)(),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], User.prototype, "hashPassword", null);
 exports.User = User = __decorate([
     (0, typeorm_1.Entity)("users")
 ], User);

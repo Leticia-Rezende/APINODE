@@ -57,6 +57,8 @@ const yup = __importStar(require("yup"));
 //Importar a biblioteca para gerar a chave recuperar senha
 const crypto_1 = __importDefault(require("crypto"));
 const nodemailer_1 = __importDefault(require("nodemailer"));
+//Importar o middleware de autenticação
+const authMiddleware_1 = require("../middlewares/authMiddleware");
 //Criar a aplicação Express
 const router = express_1.default.Router();
 // Criar a rota para realizar o login
@@ -97,6 +99,79 @@ router.post("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             message: error.message || "Erro ao realizar o login!"
         });
         return;
+    }
+}));
+// Criar a rota para validar o token
+// Endereço para acessar a api através da aplicação externa com o verbo GET: http://localhost:8080/validate-token
+// Enviar o Bearer Token do usuário logado, exemplo: Bearer <colocar-o-token-gerado-com-jwt>
+router.get("/validate-token", authMiddleware_1.verifyToken, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    res.status(200).json({
+        message: "Token válido!",
+        userId: req.user.id,
+    });
+}));
+// Criar a rota pública para cadastrar usuário
+// Endereço para acessar a api através da aplicação externa com o verbo POST: http://localhost:8080/new-users
+// A aplicação externa deve indicar que está enviado os dados em formato de objeto: Content-Type: application/json
+// Dados em formato de objeto
+/*
+{
+    "name": "Leticia",
+    "email": "leticia@gmail.com.br",
+    "password": "123456",
+    "situation": 1
+}
+*/
+router.post("/new-users", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        //Receber os dados enviados no corpo da requisição
+        var data = req.body;
+        //Validar os dados utilizando o yup
+        const schema = yup.object().shape({
+            name: yup.string().required("O campo nomé é obrigatório!").min(3, "O campo nome deve ter no minimo 3 caracteres!"),
+            email: yup.string().email("E-mail inválido!").required("O campo e-mail é obrigatório!"),
+            password: yup.string().required("O campo senha é obrigatório!").min(6, "O campo senha deve ter no minimo 3 caracteres!"),
+            situation: yup.number().required("O campo situação é obrigatório!"),
+        });
+        //Verificar se os dados passaram pela validação
+        yield schema.validate(data, { abortEarly: false });
+        //Criar uma instância do repositório de User
+        const userRepository = data_source_1.AppDataSource.getRepository(Users_1.User);
+        //Recuperar o registro do banco de dados com o valor da coluna email
+        const existingUser = yield userRepository.findOne({
+            where: { email: data.email }
+        });
+        //Verifica se já existe um usuário com o mesmo e-mail
+        if (existingUser) {
+            res.status(400).json({
+                message: "Já existe um usuário cadastrado com esse e-mail",
+            });
+            return;
+        }
+        //Criptografar a senha antes de salvar
+        //data.password = await bcrypt.hash(data.password, 10)
+        //Criar um novo registro
+        const newUser = userRepository.create(data);
+        //Salvar o registro no banco de dados
+        yield userRepository.save(newUser);
+        //Retornar resposta de sucesso
+        res.status(201).json({
+            message: "Usuário cadastrado com sucesso!",
+            situation: newUser,
+        });
+    }
+    catch (error) {
+        if (error instanceof yup.ValidationError) {
+            //Retornar erros de validação
+            res.status(400).json({
+                message: error.errors
+            });
+            return;
+        }
+        //Retornar erro em caso de falha
+        res.status(500).json({
+            message: "Erro ao cadastrar usuário!"
+        });
     }
 }));
 // Criar a rota para recuperar a senha
@@ -207,7 +282,7 @@ router.post("/recover-password", (req, res) => __awaiter(void 0, void 0, void 0,
 /*
 {
     "recoverPassword": "chave-recuperar-senha",
-    "email": "baiao@baiao.com.br"
+    "email": "leticia@gmail.com.br"
 }
 */
 router.post("/validate-recover-password", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -234,6 +309,66 @@ router.post("/validate-recover-password", (req, res) => __awaiter(void 0, void 0
         }
         res.status(200).json({
             message: "A chave recuper senha é válida!",
+        });
+        return;
+    }
+    catch (error) {
+        //Retornar erro em caso de falha
+        if (error instanceof yup.ValidationError) {
+            // Retornar erros de validação
+            res.status(400).json({
+                message: error.errors
+            });
+            return;
+        }
+        // Retornar erro em caso de falha
+        res.status(500).json({
+            message: "A chave recuper senha é inválida!",
+        });
+    }
+}));
+// Criar a rota para atualizar a senha
+// Endereço para acessar a api através da aplicação externa com o verbo POST: http://localhost:8080/update-password
+// A aplicação externa deve indicar que está enviado os dados em formato de objeto: Content-Type: application/json
+// Dados em formato de objeto
+/*
+{
+    "recoverPassword": "chave-recuperar-senha",
+    "email": "leticia@gmail.com.br",
+    "password": "123456"
+}
+*/
+router.put("/update-password", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        //Receber os dados enviados no corpo da requisição
+        var data = req.body;
+        //Validar os dados utilizando o yup
+        const schema = yup.object().shape({
+            recoverPassword: yup.string().required("A chave é obrigatória!"),
+            email: yup.string().email("E-mail inválido!").required("O campo e-mail é obrigatório!"),
+            password: yup.string().required("O campo senha é obrigatório!").min(6, "O campo senha deve ter no minimo 3 caracteres!"),
+        });
+        //Verificar se os dados passaram pela validação
+        yield schema.validate(data, { abortEarly: false });
+        //Criar uma instância do repositório de User
+        const userRepository = data_source_1.AppDataSource.getRepository(Users_1.User);
+        //Recuperar o registro do banco de dados com o valor da coluna email
+        const user = yield userRepository.findOneBy({ email: data.email, recoverPassword: data.recoverPassword });
+        //Verifica se já existe um usuário com o mesmo e-mail
+        if (!user) {
+            res.status(404).json({
+                message: "A chave recuper senha é inválida!",
+            });
+            return;
+        }
+        //Atribuir valor nulo para a coluna recoverPassword
+        data.recoverPassword = null;
+        //Atualizar os dados do usuário
+        userRepository.merge(user, data);
+        //Salvar as alterações no banco de dados
+        yield userRepository.save(user);
+        res.status(200).json({
+            message: "Senha atualizada com sucesso!",
         });
         return;
     }
