@@ -16,6 +16,7 @@ const router = express.Router();
 
 
 // Criar a Lista
+//Endereço para acessar a api através da aplicação com o verbo GET: http://localhost:8080/products?page=1&limite=10
 router.get("/products",async(req:Request, res:Response)=>{
   try{
 
@@ -30,7 +31,7 @@ router.get("/products",async(req:Request, res:Response)=>{
 
 
     // Serviço de Paginação
-    const result = await PaginationService.paginate(productRepository, page, limite, {id: "DESC"});
+    const result = await PaginationService.paginate(productRepository, page, limite, {id: "DESC"}, ["situation", "product_situations"]);
 
     //Retornar a resposta com os dados e informações da paginação
     res.status(200).json(result); //Lista todos os dados do banco
@@ -48,11 +49,17 @@ router.get("/products",async(req:Request, res:Response)=>{
 router.get("/products/:id",async(req:Request, res:Response)=>{
   try{
 
+    //Obter o ID do produto a partir dos parâmetros da requisição
     const {id} = req.params;
 
+    //Obter o repositorio da entidade Product
     const productRepository = AppDataSource.getRepository(Product);
 
-    const product = await productRepository.findOneBy({id : parseInt(id)})
+    //Buscar o produto no banco de dados
+    const product = await productRepository.findOne({
+      relations: ["situation", "category"],
+      where: { id: parseInt(id)}
+    });
 
     if(!product){
       res.status(404).json({

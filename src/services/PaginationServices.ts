@@ -7,6 +7,7 @@ interface PaginationResult <T>{
     currentPage: number;
     lastPage: number;
     totalRecords: number;
+    relations?: string[];
 }
 
 export class PaginationService{
@@ -14,7 +15,8 @@ export class PaginationService{
         repository: Repository<T>,
         page: number = 1,
         limite: number = 10,
-        order: FindOptionsOrder<T> = {} //Se vai ordenar crescente ou descrecente
+        order: FindOptionsOrder<T> = {} ,//Se vai ordenar crescente ou descrecente
+        relations?: string[],
 
     ): Promise<PaginationResult<T>>{
 
@@ -30,6 +32,7 @@ export class PaginationService{
             take: limite,
             skip: offset,
             order,
+            relations,
         });
 
         return{

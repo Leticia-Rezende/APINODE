@@ -55,6 +55,7 @@ const slugify_1 = __importDefault(require("slugify"));
 //Criar a aplicação Express
 const router = express_1.default.Router();
 // Criar a Lista
+//Endereço para acessar a api através da aplicação com o verbo GET: http://localhost:8080/products?page=1&limite=10
 router.get("/products", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         //Obter o repositório da entidade Product
@@ -64,7 +65,7 @@ router.get("/products", (req, res) => __awaiter(void 0, void 0, void 0, function
         //Definir o limite de registros por página
         const limite = Number(req.query.limite) || 10;
         // Serviço de Paginação
-        const result = yield PaginationServices_1.PaginationService.paginate(productRepository, page, limite, { id: "DESC" });
+        const result = yield PaginationServices_1.PaginationService.paginate(productRepository, page, limite, { id: "DESC" }, ["situation", "product_situations"]);
         //Retornar a resposta com os dados e informações da paginação
         res.status(200).json(result); //Lista todos os dados do banco
         return;
@@ -79,9 +80,15 @@ router.get("/products", (req, res) => __awaiter(void 0, void 0, void 0, function
 // Criar a Visualização do item cadastrado em situação
 router.get("/products/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        //Obter o ID do produto a partir dos parâmetros da requisição
         const { id } = req.params;
+        //Obter o repositorio da entidade Product
         const productRepository = data_source_1.AppDataSource.getRepository(Product_1.Product);
-        const product = yield productRepository.findOneBy({ id: parseInt(id) });
+        //Buscar o produto no banco de dados
+        const product = yield productRepository.findOne({
+            relations: ["situation", "category"],
+            where: { id: parseInt(id) }
+        });
         if (!product) {
             res.status(404).json({
                 message: "Produto não encontrada!",

@@ -12,8 +12,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PaginationService = void 0;
 class PaginationService {
     static paginate(repository_1) {
-        return __awaiter(this, arguments, void 0, function* (repository, page = 1, limite = 10, order = {} //Se vai ordenar crescente ou descrecente
-        ) {
+        return __awaiter(this, arguments, void 0, function* (repository, page = 1, limite = 10, order = {}, //Se vai ordenar crescente ou descrecente
+        relations) {
             const totalRecords = yield repository.count();
             const lastPage = Math.ceil(totalRecords / limite);
             if (page > lastPage && lastPage > 0) {
@@ -24,6 +24,7 @@ class PaginationService {
                 take: limite,
                 skip: offset,
                 order,
+                relations,
             });
             return {
                 error: false,
