@@ -45,6 +45,7 @@ export default class CreateProductSeeds {
                 productSituationId: activeSituation.id,
                 productCategoryId: electronicsCategory.id 
             },
+            
         ];
 
         //Salvar o array de objetos JSON diretamente

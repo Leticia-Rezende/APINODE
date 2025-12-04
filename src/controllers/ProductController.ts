@@ -8,7 +8,10 @@ import { abort } from "process";
 import { strict } from "assert";
 import * as yup from 'yup';
 import slugify from 'slugify' ;
-
+import { ProductSituation } from "../entity/ProductSituation";
+import { Situation } from "../entity/Situation";
+//Importar o middleware de autenticação
+import {verifyToken} from "../middlewares/authMiddleware";
 
 
 //Criar a aplicação Express
@@ -31,7 +34,7 @@ router.get("/products",async(req:Request, res:Response)=>{
 
 
     // Serviço de Paginação
-    const result = await PaginationService.paginate(productRepository, page, limite, {id: "DESC"}, ["situation", "product_situations"]);
+    const result = await PaginationService.paginate(productRepository, page, limite, {id: "DESC"}, ["category", "situation"]);
 
     //Retornar a resposta com os dados e informações da paginação
     res.status(200).json(result); //Lista todos os dados do banco
@@ -80,7 +83,7 @@ router.get("/products/:id",async(req:Request, res:Response)=>{
 });
 
 // Cadastra item no banco de dados
-router.post("/products",async(req:Request, res:Response)=>{
+router.post("/products",verifyToken, async(req:Request, res:Response)=>{
 
     try{
       //Receber os dados enviados no corpo da requisição
@@ -88,7 +91,7 @@ router.post("/products",async(req:Request, res:Response)=>{
 
       //Valida os dados utilizando o yup
       const schema = yup.object().shape({
-        name: yup
+        nameProduct: yup
             .string()
             .required("O campo nome é obrigatório!")
             .min(3, "O campo nome deve ter no mínimo 3 caracteres!")
@@ -116,14 +119,14 @@ router.post("/products",async(req:Request, res:Response)=>{
                   (value) => /^\d+(\.\d{1,2})?$/.test(value?.toString() || "")
             ),
 
-        situation: yup
+        productSituationId: yup
             .number()
             .typeError("A situação deve ser um número!")
             .required("O campo situação é obrigatório!")
             .integer("O campo situação deve ser um número inteiro!")
             .positive("O campo situação deve ser um valor positivo!"),
 
-        category: yup
+        productCategoryId: yup
             .number()
             .typeError("A categoria deve ser um número!")
             .required("O campo categoria é obrigatório!")
@@ -159,7 +162,16 @@ router.post("/products",async(req:Request, res:Response)=>{
       }
 
       // Criar um novo registro
-      const newProduct = productRepository.create(data);
+      
+
+    const newProduct = productRepository.create({
+      nameProduct: data.nameProduct, 
+      slug: data.slug,
+      description: data.description,
+      price: data.price,
+      situation: { id: data.productSituationId }, 
+      category: { id: data.productCategoryId }
+});
 
       // Salvar o registro no banco de dados
       await productRepository.save(newProduct);

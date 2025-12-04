@@ -34,6 +34,9 @@ __decorate([
 ], Product.prototype, "description", void 0);
 __decorate([
     (0, typeorm_1.Column)({ type: "decimal", precision: 10, scale: 2 }),
+    __metadata("design:type", Number)
+], Product.prototype, "price", void 0);
+__decorate([
     (0, typeorm_1.Column)({ name: 'productSituationId' }) // <-- Indica ao TypeORM que esta é a coluna física no BD
     ,
     __metadata("design:type", Number)

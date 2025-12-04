@@ -52,6 +52,8 @@ const Product_1 = require("../entity/Product");
 const PaginationServices_1 = require("../services/PaginationServices"); //Confirmar se posso usar a mesma pagina Service
 const yup = __importStar(require("yup"));
 const slugify_1 = __importDefault(require("slugify"));
+//Importar o middleware de autenticação
+const authMiddleware_1 = require("../middlewares/authMiddleware");
 //Criar a aplicação Express
 const router = express_1.default.Router();
 // Criar a Lista
@@ -65,7 +67,7 @@ router.get("/products", (req, res) => __awaiter(void 0, void 0, void 0, function
         //Definir o limite de registros por página
         const limite = Number(req.query.limite) || 10;
         // Serviço de Paginação
-        const result = yield PaginationServices_1.PaginationService.paginate(productRepository, page, limite, { id: "DESC" }, ["situation", "product_situations"]);
+        const result = yield PaginationServices_1.PaginationService.paginate(productRepository, page, limite, { id: "DESC" }, ["category", "situation"]);
         //Retornar a resposta com os dados e informações da paginação
         res.status(200).json(result); //Lista todos os dados do banco
         return;
@@ -106,13 +108,13 @@ router.get("/products/:id", (req, res) => __awaiter(void 0, void 0, void 0, func
     }
 }));
 // Cadastra item no banco de dados
-router.post("/products", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post("/products", authMiddleware_1.verifyToken, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         //Receber os dados enviados no corpo da requisição
         var data = req.body;
         //Valida os dados utilizando o yup
         const schema = yup.object().shape({
-            name: yup
+            nameProduct: yup
                 .string()
                 .required("O campo nome é obrigatório!")
                 .min(3, "O campo nome deve ter no mínimo 3 caracteres!")
@@ -132,13 +134,13 @@ router.post("/products", (req, res) => __awaiter(void 0, void 0, void 0, functio
                 .required("O campo preço é obrigatório!")
                 .positive("O preço deve ser um valor positivo!")
                 .test("is-decimal", "O preço deve ter no máximo duas casas decimais!", (value) => /^\d+(\.\d{1,2})?$/.test((value === null || value === void 0 ? void 0 : value.toString()) || "")),
-            situation: yup
+            productSituationId: yup
                 .number()
                 .typeError("A situação deve ser um número!")
                 .required("O campo situação é obrigatório!")
                 .integer("O campo situação deve ser um número inteiro!")
                 .positive("O campo situação deve ser um valor positivo!"),
-            category: yup
+            productCategoryId: yup
                 .number()
                 .typeError("A categoria deve ser um número!")
                 .required("O campo categoria é obrigatório!")
@@ -165,7 +167,14 @@ router.post("/products", (req, res) => __awaiter(void 0, void 0, void 0, functio
             return;
         }
         // Criar um novo registro
-        const newProduct = productRepository.create(data);
+        const newProduct = productRepository.create({
+            nameProduct: data.nameProduct,
+            slug: data.slug,
+            description: data.description,
+            price: data.price,
+            situation: { id: data.productSituationId },
+            category: { id: data.productCategoryId }
+        });
         // Salvar o registro no banco de dados
         yield productRepository.save(newProduct);
         // Retornar resposta de sucesso

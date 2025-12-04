@@ -19,6 +19,7 @@ export class Product {
     description!: string;
 
     @Column({type: "decimal", precision: 10, scale: 2})
+    price!: number;
 
     @Column({ name: 'productSituationId' }) // <-- Indica ao TypeORM que esta é a coluna física no BD
     productSituationId!: number;
